@@ -1,0 +1,14 @@
+# 가상환경
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+
+# 데이터 및 설정 파일
+chats.json
+*.log
+
+# OS 관련
+.DS_Store
+Thumbs.db

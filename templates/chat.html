@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <title>{{ target }}</title>
+    <style>
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('/static/fonts/Pretendard-Regular.woff') format('woff');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('/static/fonts/Pretendard-SemiBold.woff') format('woff');
+            font-weight: 600;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #abc1d1;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: none;
+        }
+
+        .header {
+            background-color: #abc1d1;
+            /* 위쪽으로 배경색을 연장하여 틈을 메움 */
+            padding: 15px 10px 5px 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            -webkit-transform: translateZ(0);
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-table td {
+            vertical-align: middle;
+        }
+
+        .header-profile-frame {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            background-color: #abc1d1;
+            overflow: hidden;
+            display: block;
+        }
+
+        .header-img-bg {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 38px;
+            height: 38px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .header-mask-overlay {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            width: 34px;
+            height: 34px;
+            border: 15px solid #abc1d1;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .header-text {
+            font-weight: 600;
+            font-size: 15px;
+            color: #000000;
+            margin-left: 8px;
+        }
+
+        .back-btn-wrapper {
+            display: block;
+            width: 25px;
+            height: 30px;
+            text-decoration: none;
+            position: relative;
+            margin-right: 5px;
+        }
+
+        .back-arrow {
+            position: absolute;
+            top: 10px;
+            left: 5px;
+            width: 10px;
+            height: 10px;
+            border-left: 3px solid #000000;
+            border-bottom: 3px solid #000000;
+            -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        #chat-container {
+            /* 확장된 헤더 패딩값에 맞춰 본문 시작 위치 조정 */
+            padding: 70px 10px 45px 10px;
+            overflow: hidden;
+        }
+
+        .msg-row {
+            width: 100%;
+            margin-bottom: 10px;
+            clear: both;
+            overflow: hidden;
+        }
+
+        .sender-name {
+            font-size: 11px;
+            color: #444444;
+            margin-bottom: 3px;
+            margin-left: 2px;
+        }
+
+        .msg-box-other {
+            float: left;
+            background-color: #ffffff;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 65%;
+            color: #000000;
+        }
+
+        .msg-box-me {
+            float: right;
+            background-color: #fee500;
+            padding: 7px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 65%;
+            color: #000000;
+        }
+
+        .time-other {
+            float: left;
+            font-size: 9px;
+            color: #555555;
+            margin-left: 5px;
+            margin-top: 12px;
+        }
+
+        .time-me {
+            float: right;
+            font-size: 9px;
+            color: #555555;
+            margin-right: 5px;
+            margin-top: 12px;
+        }
+
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #ffffff;
+            padding: 5px 8px 2px 8px;
+            height: 33px;
+            border-top: 1px solid #b2b2b2;
+            z-index: 1000;
+            -webkit-transform: translateZ(0);
+        }
+
+        .input-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #msg-input {
+            width: 96%;
+            height: 26px;
+            padding: 0 2%;
+            font-size: 14px;
+            border: 1px solid #cccccc;
+            border-radius: 13px;
+            font-family: 'Pretendard', sans-serif;
+            outline: none;
+            display: block;
+        }
+
+        #send-btn {
+            width: 50px;
+            height: 28px;
+            background-color: #fee500;
+            border: 1px solid #ddcc00;
+            border-radius: 5px;
+            font-family: 'Pretendard', sans-serif;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .button-cell {
+            width: 55px;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body onload="initChat()">
+    <div class="header">
+        <table class="header-table">
+            <tr>
+                <td style="width: 30px;">
+                    <a href="/chats" class="back-btn-wrapper">
+                        <div class="back-arrow"></div>
+                    </a>
+                </td>
+                <td style="width: 35px; text-align: center;">
+                    <div class="header-profile-frame">
+                        {% if profile %}
+                        <div class="header-img-bg"
+                            style="background-image: url('data:image/jpeg;base64,{{ profile }}');"></div>
+                        {% else %}
+                        <div class="header-img-bg"
+                            style="background-color: #dee2e6; text-align: center; line-height: 38px; font-size: 14px; color: white;">
+                            👤</div>
+                        {% endif %}
+                        <div class="header-mask-overlay"></div>
+                    </div>
+                </td>
+                <td><span class="header-text">{{ target }}</span></td>
+            </tr>
+        </table>
+    </div>
+    <div id="chat-container"></div>
+    <div class="input-area">
+        <table class="input-table">
+            <tr>
+                <td><input type="text" id="msg-input" autocomplete="off"></td>
+                <td class="button-cell"><button id="send-btn" onclick="sendMessage()">전송</button></td>
+            </tr>
+        </table>
+    </div>
+    <script>
+        var lastIdx = 0;
+        var target = "{{ target }}";
+        var isFetching = false;
+        function initChat() {
+            markRead();
+            loadMessages();
+            startPolling();
+            document.getElementById("msg-input").focus();
+        }
+        function markRead() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/read/" + encodeURIComponent(target), true);
+            xhr.send();
+        }
+        function loadMessages() {
+            if (isFetching) return;
+            isFetching = true;
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/messages/" + encodeURIComponent(target) + "?after=" + lastIdx, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    isFetching = false;
+                    if (xhr.status == 200) {
+                        var msgs = JSON.parse(xhr.responseText);
+                        if (msgs.length > 0) {
+                            var container = document.getElementById("chat-container");
+                            for (var i = 0; i < msgs.length; i++) {
+                                var m = msgs[i];
+                                var row = document.createElement("div");
+                                row.className = "msg-row";
+                                var html = "";
+                                if (m.is_me) {
+                                    html += '<div class="msg-box-me">' + m.content + '</div>';
+                                    html += '<div class="time-me">' + m.time + '</div>';
+                                } else {
+                                    html += '<div class="sender-name">' + m.sender + '</div>';
+                                    html += '<div class="msg-box-other">' + m.content + '</div>';
+                                    html += '<div class="time-other">' + m.time + '</div>';
+                                }
+                                row.innerHTML = html;
+                                container.appendChild(row);
+                            }
+                            lastIdx += msgs.length;
+                            window.scrollTo(0, 99999);
+                            markRead();
+                        }
+                    }
+                }
+            };
+            xhr.send();
+        }
+        function sendMessage() {
+            var input = document.getElementById("msg-input");
+            var val = input.value;
+            if (!val || isFetching) return;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/send", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    input.value = "";
+                }
+            };
+            xhr.send("sender=" + encodeURIComponent(target) + "&content=" + encodeURIComponent(val));
+        }
+        function startPolling() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/subscribe?t=" + new Date().getTime(), true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        loadMessages();
+                    }
+                    setTimeout(startPolling, 1000);
+                }
+            };
+            xhr.send();
+        }
+        document.getElementById("msg-input").onkeydown = function (e) {
+            if (e.keyCode == 13) {
+                sendMessage();
+                return false;
+            }
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <title>BBTalk</title>
+    <style>
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('/static/fonts/Pretendard-Regular.woff') format('woff');
+            font-weight: 400;
+        }
+
+        @font-face {
+            font-family: 'Pretendard';
+            src: url('/static/fonts/Pretendard-SemiBold.woff') format('woff');
+            font-weight: 600;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: #423630;
+            color: #ffffff;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .list-item {
+            display: block;
+            padding: 10px;
+            border-bottom: 1px solid #eeeeee;
+            text-decoration: none;
+            color: #000000;
+            overflow: hidden;
+        }
+
+        .list-item:active {
+            background-color: #f2f2f2;
+        }
+
+        .profile-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .profile-col {
+            width: 50px;
+            vertical-align: middle;
+        }
+
+        .content-col {
+            vertical-align: middle;
+            padding-left: 10px;
+        }
+
+        .profile-frame {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        .profile-img-bg {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 48px;
+            height: 48px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .mask-overlay {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            width: 44px;
+            height: 44px;
+            border: 20px solid #ffffff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .item-row {
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 2px;
+        }
+
+        .name {
+            float: left;
+            font-weight: 600;
+            font-size: 15px;
+            width: 65%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .time {
+            float: right;
+            color: #999999;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .preview-row {
+            clear: both;
+            overflow: hidden;
+        }
+
+        .preview {
+            float: left;
+            color: #666666;
+            font-size: 13px;
+            width: 80%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .badge {
+            float: right;
+            background-color: #ff4d4d;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body onload="pollUpdate()">
+    <div class="header">채팅</div>
+    <div id="chat-list">
+        {% for chat in chats %}
+        <a href="/chat/{{ chat.target }}" class="list-item">
+            <table class="profile-table">
+                <tr>
+                    <td class="profile-col">
+                        <div class="profile-frame">
+                            {% if chat.profile %}
+                            <div class="profile-img-bg"
+                                style="background-image: url('data:image/jpeg;base64,{{ chat.profile }}');"></div>
+                            {% else %}
+                            <div class="profile-img-bg"
+                                style="background-color: #dee2e6; text-align: center; line-height: 48px; color: white; font-size: 20px;">
+                                👤</div>
+                            {% endif %}
+                            <div class="mask-overlay"></div>
+                        </div>
+                    </td>
+                    <td class="content-col">
+                        <div class="item-row">
+                            <div class="name">{{ chat.target }}</div>
+                            <div class="time">{{ chat.last.time }}</div>
+                        </div>
+                        <div class="preview-row">
+                            <div class="preview">
+                                {% if chat.last.is_me %}나: {% elif chat.target != chat.last.sender %}{{ chat.last.sender
+                                }}: {% endif %}{{ chat.last.content }}
+                            </div>
+                            {% if chat.unread_count > 0 %}
+                            <div class="badge">{{ chat.unread_count }}</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </a>
+        {% endfor %}
+    </div>
+    <script>
+        function pollUpdate() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/subscribe?t=" + new Date().getTime(), true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        location.reload();
+                    } else {
+                        setTimeout(pollUpdate, 2000);
+                    }
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>
